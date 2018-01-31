@@ -149,6 +149,15 @@ class Index
         return ['success' => $success];
     }
 
+    public function deleteGuardingCardById()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $id = input('id');
+        $delete = db('guarding_card')->where('id', $id)->delete();
+        $success = $delete == 1 ? 1 : 0;
+        return ['success' => $success];
+    }
+
     public function getWishingPools()
     {
         header('Access-Control-Allow-Origin:*');

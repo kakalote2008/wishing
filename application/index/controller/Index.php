@@ -99,6 +99,21 @@ class Index
         return ['success' => 1, 'data' => $wishings];
     }
 
+
+    public function showGuardings()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $buy_user_id = input('buy_user_id/d');
+        if ($buy_user_id) {
+            $guardings = db('guarding')->where('buy_user_id', $buy_user_id)->limit(100)->order('create_time desc')->select();
+        } else {
+            $guardings = db('guarding')->order('create_time desc')->limit(100)->select();
+        }
+
+        return ['success' => 1, 'data' => $guardings];
+    }
+
+
     public function showWishingCards()
     {
         header('Access-Control-Allow-Origin:*');

@@ -12,7 +12,6 @@ class Index
     {
         header('Access-Control-Allow-Origin:*');
         $name = input('name');
-        $status = input('status/d');
         $description = input('description');
         $wishing_card_ids_array = input('wishing_card_ids/a');
         $wishing_card_ids = implode(",", $wishing_card_ids_array);
@@ -20,7 +19,6 @@ class Index
         $img_cover = input('img_cover');
         $data = [
             'name' => $name,
-            'status' => $status,
             'description' => $description,
             'wishing_card_ids' => $wishing_card_ids,
             'img_bg' => $img_bg,
@@ -185,9 +183,7 @@ class Index
         $wishing['status'] = $status['status'];
         $wishing['countdown'] = $status['countdown'];
         $wishing['wishing_card_name'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('name');
-        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');
-        $wishing['isfree'] = db('wishing_pool')->where('id', $wishing['wishing_pool_id'])->value('status');
-        if ($wishing['blessing_user_ids']) {
+        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');        if ($wishing['blessing_user_ids']) {
             $blessingInfos = [];
             $blessing_user_ids_array = explode(',', $wishing['blessing_user_ids']);
             //防止重复祝福
@@ -210,7 +206,6 @@ class Index
             $wishing_cards = db('wishing_card')->where('id', 'in', explode(',', $wishing_pool['wishing_card_ids']))->select();
             $wishing_pool['wishing_cards'] = $wishing_cards;
         }
-        $wishing_pool['isfree'] = $wishing_pool['status'];
 
         return ['success' => 1, 'data' => $wishing_pool];
     }
@@ -233,7 +228,6 @@ class Index
             $status = $this->calcWishingStatus($value);
             $wishings[$key]['status'] = $status['status'];
             $wishings[$key]['countdown'] = $status['countdown'];
-            $wishings[$key]['isfree'] = db('wishing_pool')->where('id', $wishings[$key]['wishing_pool_id'])->value('status');
             $wishings[$key]['wishing_card_name'] = db('wishing_card', [], false)->where('id', $wishings[$key]['wishing_card_id'])->value('name');
             $wishings[$key]['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishings[$key]['wishing_card_id'])->value('img');
 
@@ -280,7 +274,6 @@ class Index
             $status = $this->calcWishingStatus($value);
             $wishings[$key]['status'] = $status['status'];
             $wishings[$key]['countdown'] = $status['countdown'];
-            $wishings[$key]['isfree'] = db('wishing_pool')->where('id', $wishings[$key]['wishing_pool_id'])->value('status');
             $wishings[$key]['wishing_card_name'] = db('wishing_card')->where('id', $wishings[$key]['wishing_card_id'])->value('name');
             $wishings[$key]['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishings[$key]['wishing_card_id'])->value('img');
         }

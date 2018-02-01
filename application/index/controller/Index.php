@@ -11,6 +11,7 @@ class Index
     public function createWishingPool()
     {
         header('Access-Control-Allow-Origin:*');
+        $id = input('id');
         $name = input('name');
         $description = input('description');
         $wishing_card_ids_array = input('wishing_card_ids/a');
@@ -24,8 +25,14 @@ class Index
             'img_bg' => $img_bg,
             'img_cover' => $img_cover,
         ];
-        $insert = db('wishing_pool')->insert($data);
-        $success = $insert == 1 ? 1 : 0;
+        if ($id) {
+            $update = db('wishing_pool')->where('id', $id)->update($data);
+            $success = $update == 1 ? 1 : 0;
+        } else {
+            $insert = db('wishing_pool')->insert($data);
+            $success = $insert == 1 ? 1 : 0;
+        }
+
         return ['success' => $success];
     }
 
@@ -99,7 +106,6 @@ class Index
         return ['success' => 1, 'data' => $wishings];
     }
 
-
     public function showGuardings()
     {
         header('Access-Control-Allow-Origin:*');
@@ -112,7 +118,6 @@ class Index
 
         return ['success' => 1, 'data' => $guardings];
     }
-
 
     public function showWishingCards()
     {
@@ -207,7 +212,7 @@ class Index
         $wishing['status'] = $status['status'];
         $wishing['countdown'] = $status['countdown'];
         $wishing['wishing_card_name'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('name');
-        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');        if ($wishing['blessing_user_ids']) {
+        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');if ($wishing['blessing_user_ids']) {
             $blessingInfos = [];
             $blessing_user_ids_array = explode(',', $wishing['blessing_user_ids']);
             //防止重复祝福
@@ -256,7 +261,7 @@ class Index
             $wishings[$key]['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishings[$key]['wishing_card_id'])->value('img');
 
         }
-        return ['success' => 1, 'data' => $wishings, 'hasmore' => $hasmore];
+        return ['success' => 1, 'data' => $wishings, 'hasmore' => $hasmore, 'total_count' => $count];
     }
     public function getGuardingsByUserId()
     {
@@ -301,7 +306,7 @@ class Index
             $wishings[$key]['wishing_card_name'] = db('wishing_card')->where('id', $wishings[$key]['wishing_card_id'])->value('name');
             $wishings[$key]['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishings[$key]['wishing_card_id'])->value('img');
         }
-        return ['success' => 1, 'data' => $wishings, 'hasmore' => $hasmore];
+        return ['success' => 1, 'data' => $wishings, 'hasmore' => $hasmore, 'total_count' => $count];
     }
 
     public function wish()

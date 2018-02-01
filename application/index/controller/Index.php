@@ -425,15 +425,18 @@ class Index
         $create_time = strtotime($wishing['create_time']);
         $now = time();
         $valid_time = db('wishing_card')->where('id', $wishing['wishing_card_id'])->value('valid_time');
-        $calc = $valid_time + $wishing['blessing_count'] / 5 - ($now - $create_time);
+
+        $calc = $valid_time + round($wishing['blessing_count'] / 5) * 3600 * 24 - ($now - $create_time);
         if ($calc > 0) {
             $status['status'] = 1;
             $status['countdown'] = $calc;
-            db('wishing')->where('id', $wishing['id'])->setField('status', 1);
         } else {
             $status['status'] = 2;
             $status['countdown'] = 0;
-            db('wishing')->where('id', $wishing['id'])->setField('status', 2);
+        }
+        //状态更新
+        if ($wishing['status'] != $status['status']) {
+            db('wishing')->where('id', $wishing['id'])->setField('status', $status['status']);
         }
         return $status;
     }

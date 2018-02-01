@@ -318,11 +318,13 @@ class Index
         $user_id = input('user_id/d', 0);
         $wishing_pool_id = input('wishing_pool_id/d');
         $wishing_card_id = input('wishing_card_id/d');
+        $valid_time = db('wishing_card')->where('id', $wishing_card_id)->value('valid_time');
         $data = [
             'content' => $content,
             'user_id' => $user_id,
             'wishing_pool_id' => $wishing_pool_id,
             'wishing_card_id' => $wishing_card_id,
+            'valid_time' => $valid_time,
             'out_trade_no' => $out_trade_no,
             'public' => $public,
         ];
@@ -422,10 +424,24 @@ class Index
      */
     private function calcWishingStatus($wishing)
     {
-        $create_time = strtotime($wishing['create_time']);
+       
         $now = time();
-        $valid_time = db('wishing_card')->where('id', $wishing['wishing_card_id'])->value('valid_time');
-
+        //先计算祝福增益逻辑
+        $add = round($wishing['blessing_count'] / 5);
+        if ($add > $wishing['add']) {
+            if ($wishing['status'] == 2) { //已经失效的要重置
+                db('wishing', [], false)->where('id', $wishing['id'])->setField('create_time', $now);
+                db('wishing', [], false)->where('id', $wishing['id'])->setField('valid_time', 3600 * 24 * ($add - $wishing['add']));
+                db('wishing', [], false)->where('id', $wishing['id'])->setField('add', $add);
+            } else if ($wishing['status'] == 1) { //还没失效的累加时间
+                $valid_time = db('wishing', [], false)->where('id', $wishing['id'])->value('valid_time');
+                db('wishing', [], false)->where('id', $wishing['id'])->setField('valid_time', $valid_time + 3600 * 24 * ($add - $wishing['add']));
+                db('wishing', [], false)->where('id', $wishing['id'])->setField('add', $add);
+            }
+        }
+        //计算展现状态
+        $create_time = strtotime($wishing['create_time']);
+        $valid_time = db('wishing', [], false)->where('id', $wishing['id'])->value('valid_time');
         $calc = $valid_time - ($now - $create_time);
         if ($calc > 0) {
             $status['status'] = 1;
@@ -433,16 +449,6 @@ class Index
         } else {
             $status['status'] = 2;
             $status['countdown'] = 0;
-        }
-
-        //如果愿望已经失效，开始计算祝福增益逻辑
-        if ($status['status'] == 2) {
-            $add = round($wishing['blessing_count'] / 5);
-            if ($add > $wishing['add']) {
-                db('wishing', [], false)->where('id', $wishing['id'])->setField('create_time', $now);
-                db('wishing', [], false)->where('id', $wishing['id'])->setField('valid_time', 3600 * 24);
-                db('wishing', [], false)->where('id', $wishing['id'])->setInc('add');
-            }
         }
 
         //状态更新

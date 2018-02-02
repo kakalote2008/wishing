@@ -197,6 +197,8 @@ class Index
         $id = input('id');
         $guarding = db('guarding')->where('id', $id)->find();
         $status = $this->calcGuardingStatus($guarding);
+        $guarding['guarding_card_name'] = db('guarding_card', [], false)->where('id', $guarding['guarding_card_id'])->value('name');
+        $guarding['guarding_card_img'] = db('guarding_card', [], false)->where('id', $guarding['guarding_card_id'])->value('img');
         $guarding['status'] = $status['status'];
         $guarding['countdown'] = $status['countdown'];
         return ['success' => 1, 'data' => $guarding];
@@ -218,7 +220,8 @@ class Index
         $wishing['status'] = $status['status'];
         $wishing['countdown'] = $status['countdown'];
         $wishing['wishing_card_name'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('name');
-        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');if ($wishing['blessing_user_ids']) {
+        $wishing['wishing_card_img'] = db('wishing_card', [], false)->where('id', $wishing['wishing_card_id'])->value('img');
+        if ($wishing['blessing_user_ids']) {
             $blessingInfos = [];
             $blessing_user_ids_array = explode(',', $wishing['blessing_user_ids']);
             //防止重复祝福
@@ -439,7 +442,7 @@ class Index
      */
     private function calcWishingStatus($wishing)
     {
-       
+
         $now = time();
         //先计算祝福增益逻辑
         $add = round($wishing['blessing_count'] / 5);

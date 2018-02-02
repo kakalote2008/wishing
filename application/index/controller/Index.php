@@ -39,6 +39,7 @@ class Index
     public function createWishingCard()
     {
         header('Access-Control-Allow-Origin:*');
+        $id = input('id');
         $name = input('name');
         $description = input('description');
         $price = input('price/f');

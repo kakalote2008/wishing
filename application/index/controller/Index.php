@@ -51,8 +51,13 @@ class Index
             'img' => $img,
             'valid_time' => $valid_time,
         ];
-        $insert = db('wishing_card')->insert($data);
-        $success = $insert == 1 ? 1 : 0;
+        if ($id) {
+            $update = db('wishing_card')->where('id', $id)->update($data);
+            $success = $update == 1 ? 1 : 0;
+        } else {
+            $insert = db('wishing_card')->insert($data);
+            $success = $insert == 1 ? 1 : 0;
+        }
         return ['success' => $success];
     }
 

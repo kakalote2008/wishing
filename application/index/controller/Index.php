@@ -239,6 +239,15 @@ class Index
         return ['success' => 1, 'data' => $wishing_pool];
     }
 
+    public function getWishingCardById()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $id = input('id');
+        $wishing_card = db('wishing_card')->where('id', $id)->find();
+
+        return ['success' => 1, 'data' => $wishing_card];
+    }
+
     public function getWishingsByPoolId()
     {
         header('Access-Control-Allow-Origin:*');

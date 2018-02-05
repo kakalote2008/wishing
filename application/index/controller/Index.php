@@ -197,10 +197,10 @@ class Index
         $id = input('id');
         $guarding = db('guarding')->where('id', $id)->find();
         $status = $this->calcGuardingStatus($guarding);
-        $guarding['guarding_card_name'] = db('guarding_card', [], false)->where('id', $guarding['guarding_card_id'])->value('name');
-        $guarding['guarding_card_img'] = db('guarding_card', [], false)->where('id', $guarding['guarding_card_id'])->value('img');
+        $guarding_card = db('guarding_card')->where('id', $guarding['guarding_card_id'])->find();
         $guarding['status'] = $status['status'];
         $guarding['countdown'] = $status['countdown'];
+        $guarding['guarding_card'] = $guarding_card;
         return ['success' => 1, 'data' => $guarding];
     }
 

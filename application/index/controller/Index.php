@@ -257,6 +257,15 @@ class Index
         return ['success' => 1, 'data' => $wishing_card];
     }
 
+    public function getGuardingCardById()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $id = input('id');
+        $guarding_card = db('guarding_card')->where('id', $id)->find();
+
+        return ['success' => 1, 'data' => $guarding_card];
+    }
+
     public function getWishingsByPoolId()
     {
         header('Access-Control-Allow-Origin:*');
@@ -411,6 +420,10 @@ class Index
         header('Access-Control-Allow-Origin:*');
         $guarding_id = input('guarding_id/d');
         $receive_user_id = input('receive_user_id/d');
+        $guarding = db('guarding')->where('id',$guarding_id)->find();
+        if ($guarding['receive_user_id']){
+            return ['success'=>0,'msg'=>'已经被领取'];
+        }
         $receive_time = date('Y-m-d H:i:s');
         $data = [
             'receive_user_id' => $receive_user_id,

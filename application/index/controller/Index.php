@@ -405,6 +405,23 @@ class Index
         return ['success' => $success, 'guarding_id' => $insert];
 
     }
+
+    public function receive()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $guarding_id = input('guarding_id/d');
+        $receive_user_id = input('receive_user_id/d');
+        $receive_time = date('Y-m-d H:i:s');
+        $data = [
+            'receive_user_id' => $receive_user_id,
+            'receive_time' => $receive_time
+        ];
+        $update = db('guarding')->where('id',$guarding_id)->update($data);
+        $success = $update > 0 ? 1 : 0;
+
+        return ['success' => $success];
+
+    }
     /**
      * 1 守护中
      * 2 守护失效

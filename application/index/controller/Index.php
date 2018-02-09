@@ -420,16 +420,31 @@ class Index
         header('Access-Control-Allow-Origin:*');
         $guarding_id = input('guarding_id/d');
         $receive_user_id = input('receive_user_id/d');
-        $guarding = db('guarding')->where('id',$guarding_id)->find();
-        if ($guarding['receive_user_id']){
-            return ['success'=>0,'msg'=>'已经被领取'];
+        $guarding = db('guarding')->where('id', $guarding_id)->find();
+        if ($guarding['receive_user_id']) {
+            return ['success' => 0, 'msg' => '已经被领取'];
         }
         $receive_time = date('Y-m-d H:i:s');
         $data = [
             'receive_user_id' => $receive_user_id,
-            'receive_time' => $receive_time
+            'receive_time' => $receive_time,
         ];
-        $update = db('guarding')->where('id',$guarding_id)->update($data);
+        $update = db('guarding')->where('id', $guarding_id)->update($data);
+        $success = $update > 0 ? 1 : 0;
+
+        return ['success' => $success];
+
+    }
+
+    public function share()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $guarding_id = input('guarding_id/d');
+        $share_time = date('Y-m-d H:i:s');
+        $data = [
+            'share_time' => $share_time,
+        ];
+        $update = db('guarding')->where('id', $guarding_id)->update($data);
         $success = $update > 0 ? 1 : 0;
 
         return ['success' => $success];
@@ -439,6 +454,7 @@ class Index
      * 1 守护中
      * 2 守护失效
      * 3 未领取
+     * 4 未分享
      */
     private function calcGuardingStatus($guarding)
     {
@@ -456,8 +472,11 @@ class Index
                 $status['countdown'] = 0;
                 db('guarding')->where('id', $guarding['id'])->setField('status', 2);
             }
-        } else {
+        } else if ($guarding['share_time']) {
             $status['status'] = 3;
+            $status['countdown'] = 0;
+        } else {
+            $status['status'] = 4;
             $status['countdown'] = 0;
         }
         return $status;

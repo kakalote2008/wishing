@@ -445,7 +445,7 @@ class Index
         header('Access-Control-Allow-Origin:*');
         $guarding_id = input('guarding_id/d');
         $data = [
-            'share_time' => null,
+            'share_time' => '0000-00-00 00:00:00',
         ];
         $update = db('guarding')->where('id', $guarding_id)->update($data);
         $success = $update > 0 ? 1 : 0;

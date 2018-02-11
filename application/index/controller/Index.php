@@ -197,12 +197,14 @@ class Index
         $id = input('id');
         $guarding = db('guarding')->where('id', $id)->find();
         $buy_user = db('user')->where('id',$guarding['buy_user_id'])->find();
+        $receive_user = db('user')->where('id',$guarding['receive_user_id'])->find();
         $status = $this->calcGuardingStatus($guarding);
         $guarding_card = db('guarding_card')->where('id', $guarding['guarding_card_id'])->find();
         $guarding['status'] = $status['status'];
         $guarding['countdown'] = $status['countdown'];
         $guarding['guarding_card'] = $guarding_card;
         $guarding['buy_user'] = $buy_user;
+        $guarding['receive_user'] = $receive_user;
         return ['success' => 1, 'data' => $guarding];
     }
 
@@ -430,6 +432,20 @@ class Index
         $data = [
             'receive_user_id' => $receive_user_id,
             'receive_time' => $receive_time,
+        ];
+        $update = db('guarding')->where('id', $guarding_id)->update($data);
+        $success = $update > 0 ? 1 : 0;
+
+        return ['success' => $success];
+
+    }
+
+    public function resetShare()
+    {
+        header('Access-Control-Allow-Origin:*');
+        $guarding_id = input('guarding_id/d');
+        $data = [
+            'share_time' => null,
         ];
         $update = db('guarding')->where('id', $guarding_id)->update($data);
         $success = $update > 0 ? 1 : 0;

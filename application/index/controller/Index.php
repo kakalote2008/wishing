@@ -196,11 +196,13 @@ class Index
         header('Access-Control-Allow-Origin:*');
         $id = input('id');
         $guarding = db('guarding')->where('id', $id)->find();
+        $buy_user = db('user')->where('id',$guarding['buy_user_id'])->find();
         $status = $this->calcGuardingStatus($guarding);
         $guarding_card = db('guarding_card')->where('id', $guarding['guarding_card_id'])->find();
         $guarding['status'] = $status['status'];
         $guarding['countdown'] = $status['countdown'];
         $guarding['guarding_card'] = $guarding_card;
+        $guarding['buy_user'] = $buy_user;
         return ['success' => 1, 'data' => $guarding];
     }
 

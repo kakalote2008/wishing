@@ -305,8 +305,12 @@ class Index
         $hasmore = $count > $start + $limit;
         foreach ($guardings as $key => $value) {
             if ($guardings[$key]['buy_user_id']) {
-                $guardings[$key]['nick_name'] = db('user', [], false)->where('id', $guardings[$key]['buy_user_id'])->value('nick_name');
-                $guardings[$key]['avatar_url'] = db('user', [], false)->where('id', $guardings[$key]['buy_user_id'])->value('avatar_url');
+                $guardings[$key]['buy_user'] = db('user', [], false)->where('id', $guardings[$key]['buy_user_id'])->find();
+                
+            }
+            if ($guardings[$key]['receive_user_id']) {
+                $guardings[$key]['receive_user'] = db('user', [], false)->where('id', $guardings[$key]['receive_user_id'])->find();
+                
             }
             $status = $this->calcGuardingStatus($value);
             $guardings[$key]['status'] = $status['status'];

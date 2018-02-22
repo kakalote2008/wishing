@@ -196,8 +196,8 @@ class Index
         header('Access-Control-Allow-Origin:*');
         $id = input('id');
         $guarding = db('guarding')->where('id', $id)->find();
-        $buy_user = db('user')->where('id',$guarding['buy_user_id'])->find();
-        $receive_user = db('user')->where('id',$guarding['receive_user_id'])->find();
+        $buy_user = db('user')->where('id', $guarding['buy_user_id'])->find();
+        $receive_user = db('user')->where('id', $guarding['receive_user_id'])->find();
         $status = $this->calcGuardingStatus($guarding);
         $guarding_card = db('guarding_card')->where('id', $guarding['guarding_card_id'])->find();
         $guarding['status'] = $status['status'];
@@ -306,11 +306,11 @@ class Index
         foreach ($guardings as $key => $value) {
             if ($guardings[$key]['buy_user_id']) {
                 $guardings[$key]['buy_user'] = db('user', [], false)->where('id', $guardings[$key]['buy_user_id'])->find();
-                
+
             }
             if ($guardings[$key]['receive_user_id']) {
                 $guardings[$key]['receive_user'] = db('user', [], false)->where('id', $guardings[$key]['receive_user_id'])->find();
-                
+
             }
             $status = $this->calcGuardingStatus($value);
             $guardings[$key]['status'] = $status['status'];
@@ -481,10 +481,11 @@ class Index
     private function calcGuardingStatus($guarding)
     {
         $valid_time = db('guarding_card')->where('id', $guarding['guarding_card_id'])->value('valid_time');
-        $receive_time = strtotime($guarding['receive_time']);
-        $now = time();
-        $calc = $valid_time - ($now - $receive_time);
-        if ($guarding['receive_user_id'] > 0) { 
+
+        if ($guarding['receive_user_id'] > 0) {
+            $receive_time = strtotime($guarding['receive_time']);
+            $now = time();
+            $calc = $valid_time - ($now - $receive_time);
             if ($calc > 0) {
                 $status['status'] = 1;
                 $status['countdown'] = $calc;
@@ -496,7 +497,7 @@ class Index
             }
         } else if ($guarding['share_time']) {
             $status['status'] = 3;
-            $status['countdown'] = $calc>0?$calc:0;
+            $status['countdown'] = $valid_time;
             db('guarding')->where('id', $guarding['id'])->setField('status', 3);
         } else {
             $status['status'] = 4;

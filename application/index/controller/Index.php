@@ -481,10 +481,10 @@ class Index
     private function calcGuardingStatus($guarding)
     {
         $valid_time = db('guarding_card')->where('id', $guarding['guarding_card_id'])->value('valid_time');
-        if ($guarding['receive_user_id'] > 0) {
-            $receive_time = strtotime($guarding['receive_time']);
-            $now = time();
-            $calc = $valid_time - ($now - $receive_time);
+        $receive_time = strtotime($guarding['receive_time']);
+        $now = time();
+        $calc = $valid_time - ($now - $receive_time);
+        if ($guarding['receive_user_id'] > 0) { 
             if ($calc > 0) {
                 $status['status'] = 1;
                 $status['countdown'] = $calc;
@@ -496,10 +496,12 @@ class Index
             }
         } else if ($guarding['share_time']) {
             $status['status'] = 3;
-            $status['countdown'] = 0;
+            $status['countdown'] = $calc>0?$calc:0;
+            db('guarding')->where('id', $guarding['id'])->setField('status', 3);
         } else {
             $status['status'] = 4;
             $status['countdown'] = 0;
+            db('guarding')->where('id', $guarding['id'])->setField('status', 4);
         }
         return $status;
     }

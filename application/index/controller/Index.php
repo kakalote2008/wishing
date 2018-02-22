@@ -432,6 +432,12 @@ class Index
         if ($guarding['receive_user_id']) {
             return ['success' => 0, 'msg' => '已经被领取'];
         }
+        $user_guardings = db('guarding')->where('buy_user_id',$guarding['buy_user_id'])->select();
+        foreach($user_guardings as $user_guarding){
+            if($user_guarding['guarding_card_id'] == $guarding['guarding_card_id']){
+                return ['success' => 0, 'msg' => '您已经有一个同种御守了，不能再拥有第二个咯！'];
+            }
+        }
         $receive_time = date('Y-m-d H:i:s');
         $data = [
             'receive_user_id' => $receive_user_id,

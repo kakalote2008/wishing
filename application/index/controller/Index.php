@@ -501,7 +501,7 @@ class Index
             db('guarding')->where('id', $guarding['id'])->setField('status', 3);
         } else {
             $status['status'] = 4;
-            $status['countdown'] = 0;
+            $status['countdown'] = $valid_time;
             db('guarding')->where('id', $guarding['id'])->setField('status', 4);
         }
         return $status;
